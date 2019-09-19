@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	"fmt"
@@ -10,12 +10,21 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type tokenClaim struct {
-	ID    string   `json:"id"`
-	Type  string   `json:"type"`
-	Role  string   `json:"role"`
-	Scope []string `json:"scope"`
-	jwt.StandardClaims
+// const accessTokenDuration = time.Duration(time.Minute * 15)
+// const refreshTokenDuration = time.Duration(time.Minute * 30)
+
+// ValidateUser validates credentials of a potential user
+func ValidateUser(username, password string) (bool, User) {
+	if username == "joe" && password == "password" {
+		return true, User{
+			ID:       bson.NewObjectId(),
+			Name:     "ioe",
+			Username: "ioe",
+			Role:     "emp",
+			Scope:    []string{"1", "2"},
+		}
+	}
+	return false, User{}
 }
 
 func JWTMiddleware() echo.MiddlewareFunc {
@@ -33,20 +42,6 @@ func JWTMiddleware() echo.MiddlewareFunc {
 			return false
 		},
 	}) //echo.HandlerFunc
-}
-
-// ValidateUser validates credentials of a potential user
-func ValidateUser(username, password string) (bool, User) {
-	if username == "joe" && password == "password" {
-		return true, User{
-			ID:       bson.NewObjectId(),
-			Name:     "ioe",
-			Username: "ioe",
-			Role:     "emp",
-			Scope:    []string{"1", "2"},
-		}
-	}
-	return false, User{}
 }
 
 func NewToken(id string, expiresIn time.Duration, tokenType string, role string, scope ...string) (string, error) {
