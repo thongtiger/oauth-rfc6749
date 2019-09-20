@@ -16,6 +16,12 @@ const (
 	userInvalidJSON = `{"grant_type":"fail","username":"joe","password":"password"}`
 )
 
+var (
+	client_id, access_token, refresh_token, token_type string
+	expires_in                                         int64
+	scope                                              []string
+)
+
 func TestLoginSuccess(t *testing.T) {
 	t.Run("it should return httpCode 200", func(t *testing.T) {
 		// Setup

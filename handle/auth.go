@@ -2,16 +2,20 @@ package handle
 
 import (
 	"jwt-refresh-token/auth"
-	"log"
+	"jwt-refresh-token/redis"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo"
+	"gopkg.in/mgo.v2/bson"
 )
 
-const accessTokenDuration = time.Duration(time.Minute * 15)
-const refreshTokenDuration = time.Duration(time.Minute * 30)
+const (
+	accessTokenDuration  = time.Duration(time.Minute * 15)
+	refreshTokenDuration = time.Duration(time.Minute * 30)
+)
 
+// TokenHandle route
 func TokenHandle(c echo.Context) (err error) {
 	body := new(auth.Oauth2)
 	if err = c.Bind(body); err != nil {
@@ -19,25 +23,20 @@ func TokenHandle(c echo.Context) (err error) {
 	}
 	switch body.GrantType {
 	case "password":
-		/*
-			- validateUser <- user
-			- newRefreshToken <- refresh_token
-			- newAccessToken <- access_token
-		*/
 		if ok, user := auth.ValidateUser(body.Username, body.Password); ok {
+			// return
 			GenerateTK(c, user)
 		}
 
 	case "refresh_token":
-		/*
-			- check exists refreshToken
-			- get refreshToken info
-			- replace old refreshToken
-			- response new access_token,refresh_token
-		*/
+		// validate
 		if ok, claim := auth.ValidateRefreshToken(body.RefreshToken); ok {
-			log.Println(claim)
-			// GenerateTK(c, user)
+			// exists
+			if ok, _ := redis.Exists(claim.ID, body.RefreshToken); ok {
+				user := auth.User{ID: bson.ObjectIdHex(claim.ID), Role: claim.Role, Scope: claim.Scope}
+				return GenerateTK(c, user)
+			}
+			return c.JSON(http.StatusBadGateway, echo.Map{"message": "refresh_token does not exist or expired"})
 		}
 	}
 	return c.JSON(http.StatusUnauthorized, echo.Map{})
@@ -52,6 +51,10 @@ func GenerateTK(c echo.Context, user auth.User) (err error) {
 	refreshToken, err := auth.NewToken(user.ID.Hex(), refreshTokenDuration, "refresh_token", user.Role, user.Scope...)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "can't generate refresh_token"})
+	}
+
+	if _, err := redis.SetRefreshToken(user.ID.Hex(), refreshToken, refreshTokenDuration); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{

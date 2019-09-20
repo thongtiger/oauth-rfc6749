@@ -7,7 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type tokenClaim struct {
+type TokenClaim struct {
 	ID    string   `json:"id"`
 	Type  string   `json:"type"`
 	Role  string   `json:"role"`
