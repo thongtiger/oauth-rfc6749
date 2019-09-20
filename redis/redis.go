@@ -2,6 +2,7 @@ package redis
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -21,22 +22,25 @@ func RedisClient() *redis.Client {
 	return client
 }
 
-func Exists(ClientID, RefreshToken string) (bool, error) {
+func Exists(ClientID, RefreshToken string) bool {
 	client := RedisClient()
 	defer client.Close()
 
 	dbValue, err := client.Get(ClientID).Result()
 	if err == redis.Nil {
-		return false, fmt.Errorf("redis: refresh_token does not exist or expired")
+		log.Println("redis: refresh_token does not exist or expired")
+		return false
 	}
 	if dbValue == "" {
-		return false, fmt.Errorf("redis: refresh_token is expired")
+		log.Println("redis: refresh_token is expired")
+		return false
 	}
 	// check value
 	if dbValue == RefreshToken {
-		return true, nil
+		return true
 	}
-	return false, fmt.Errorf("redis: refresh_token does not exist")
+	log.Println("redis: refresh_token does not exist")
+	return false
 }
 
 func SetRefreshToken(ClientID, RefreshToken string, ExpireIn time.Duration) (bool, error) {
@@ -45,7 +49,8 @@ func SetRefreshToken(ClientID, RefreshToken string, ExpireIn time.Duration) (boo
 
 	err := client.Set(ClientID, RefreshToken, ExpireIn).Err()
 	if err != nil {
-		return false, fmt.Errorf("redis: error set new refresh_token ")
+		log.Println("redis: error set new refresh_token")
+		return false, fmt.Errorf("redis: error set new refresh_token")
 	}
 	return true, nil
 }

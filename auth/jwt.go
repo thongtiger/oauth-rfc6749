@@ -1,7 +1,8 @@
 package auth
 
 import (
-	"fmt"
+	"jwt-refresh-token/redis"
+	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -10,8 +11,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-const accessTokenDuration = time.Duration(time.Minute * 15)
-const refreshTokenDuration = time.Duration(time.Minute * 30)
+const secretJWT = "secret"
 
 // ValidateUser validates credentials of a potential user
 func ValidateUser(username, password string) (bool, User) {
@@ -27,32 +27,26 @@ func ValidateUser(username, password string) (bool, User) {
 	return false, User{}
 }
 func ValidateRefreshToken(tokenString string) (bool, *TokenClaim) {
-	// validate
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte("secret"), nil
-	})
 
-	// check
+	token, err := jwt.ParseWithClaims(tokenString, &TokenClaim{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretJWT), nil
+	})
 	if err != nil {
-		// return false, errors.New("invalid auth token")
 		return false, nil
 	}
-	// check
 	if claims, ok := token.Claims.(*TokenClaim); ok && token.Valid {
-		fmt.Print(claims.Role)
+		log.Printf("%v %v", claims.ID, claims.StandardClaims.ExpiresAt)
 		return true, claims
+
 	}
 	return false, nil
+
 }
 
 func JWTMiddleware() echo.MiddlewareFunc {
 	return middleware.JWTWithConfig(middleware.JWTConfig{
 		Claims:     &TokenClaim{},
-		SigningKey: []byte("secret"),
+		SigningKey: []byte(secretJWT),
 		ErrorHandler: func(err error) error {
 			return echo.ErrUnauthorized
 		},
@@ -81,10 +75,12 @@ func NewToken(id string, expiresIn time.Duration, tokenType string, role string,
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Generate encoded token and send it as response.
 
-	t, err := token.SignedString([]byte("secret"))
+	t, err := token.SignedString([]byte(secretJWT))
 
 	if tokenType == "refresh_token" {
-
+		if _, err := redis.SetRefreshToken(id, t, expiresIn); err != nil {
+			return "", err
+		}
 	}
 
 	return t, err

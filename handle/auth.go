@@ -24,20 +24,22 @@ func TokenHandle(c echo.Context) (err error) {
 	switch body.GrantType {
 	case "password":
 		if ok, user := auth.ValidateUser(body.Username, body.Password); ok {
-			// return
-			GenerateTK(c, user)
+			// generate token
+			return GenerateTK(c, user)
 		}
-
 	case "refresh_token":
 		// validate
-		if ok, claim := auth.ValidateRefreshToken(body.RefreshToken); ok {
-			// exists
-			if ok, _ := redis.Exists(claim.ID, body.RefreshToken); ok {
-				user := auth.User{ID: bson.ObjectIdHex(claim.ID), Role: claim.Role, Scope: claim.Scope}
-				return GenerateTK(c, user)
-			}
-			return c.JSON(http.StatusBadGateway, echo.Map{"message": "refresh_token does not exist or expired"})
+		tokenValid, claim := auth.ValidateRefreshToken(body.RefreshToken)
+		if !tokenValid {
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": "bad refresh_token"})
 		}
+		// exists
+		if exist := redis.Exists(claim.ID, body.RefreshToken); !exist {
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": "refresh_token does not exist or expired"})
+		}
+		// generate token
+		user := auth.User{ID: bson.ObjectIdHex(claim.ID), Role: claim.Role, Scope: claim.Scope}
+		return GenerateTK(c, user)
 	}
 	return c.JSON(http.StatusUnauthorized, echo.Map{})
 }
@@ -52,11 +54,6 @@ func GenerateTK(c echo.Context, user auth.User) (err error) {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "can't generate refresh_token"})
 	}
-
-	if _, err := redis.SetRefreshToken(user.ID.Hex(), refreshToken, refreshTokenDuration); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
-	}
-
 	return c.JSON(http.StatusOK, echo.Map{
 		"client_id":     user.ID,
 		"access_token":  accessToken,

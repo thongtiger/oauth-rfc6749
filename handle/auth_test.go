@@ -62,3 +62,25 @@ func TestLoginFail(t *testing.T) {
 		}
 	})
 }
+
+func TestRefreshToken(t *testing.T) {
+	t.Run("it should return httpCode 401", func(t *testing.T) {
+		// Setup
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(userInvalidJSON))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		// mock
+		h := handle.TokenHandle(c)
+		// Assertions
+		if assert.NoError(t, h) {
+			assert.Equal(t, http.StatusUnauthorized, rec.Code)
+			if status := rec.Code; status != http.StatusUnauthorized {
+				t.Errorf("wrong code: got %v want %v", status, http.StatusOK)
+			}
+
+		}
+	})
+}
