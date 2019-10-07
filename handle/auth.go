@@ -62,5 +62,7 @@ func GenerateTK(c echo.Context, user auth.User) (err error) {
 		"token_type":    "bearer",
 		"expires_in":    int64(accessTokenDuration.Seconds()),
 		"scope":         user.Scope,
+		"role":          user.Role,
+		"name":          user.Name,
 	})
 }
