@@ -1,10 +1,11 @@
 package handle
 
 import (
-	"jwt-refresh-token/auth"
-	"jwt-refresh-token/redis"
 	"net/http"
 	"time"
+
+	"github.com/thongtiger/oauth-rfc6749/auth"
+	"github.com/thongtiger/oauth-rfc6749/redis"
 
 	"github.com/labstack/echo"
 	"gopkg.in/mgo.v2/bson"

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"jwt-refresh-token/auth"
-	"jwt-refresh-token/handle"
 	"net/http"
+
+	"github.com/thongtiger/oauth-rfc6749/auth"
+	"github.com/thongtiger/oauth-rfc6749/handle"
 
 	"github.com/labstack/echo"
 )

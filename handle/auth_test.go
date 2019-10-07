@@ -1,11 +1,12 @@
 package handle_test
 
 import (
-	"jwt-refresh-token/handle"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/thongtiger/oauth-rfc6749/handle"
 
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"

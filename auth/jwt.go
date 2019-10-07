@@ -1,9 +1,10 @@
 package auth
 
 import (
-	"jwt-refresh-token/redis"
 	"log"
 	"time"
+
+	"github.com/thongtiger/oauth-rfc6749/redis"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
