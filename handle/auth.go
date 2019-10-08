@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	//accessTokenDuration  = time.Duration(time.Second* 5) // test
 	accessTokenDuration  = time.Duration(time.Minute * 15)
 	refreshTokenDuration = time.Duration(time.Minute * 30)
 )
@@ -60,7 +61,7 @@ func GenerateTK(c echo.Context, user auth.User) (err error) {
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		"token_type":    "bearer",
-		"expires_in":    int64(accessTokenDuration.Seconds()),
+		"expires_in":    accessTokenDuration.Seconds(),
 		"scope":         user.Scope,
 		"role":          user.Role,
 		"name":          user.Name,
