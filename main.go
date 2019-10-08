@@ -27,6 +27,8 @@ func main() {
 	e.GET("/protected", func(c echo.Context) error {
 		return c.String(http.StatusOK, "allow protected")
 	}, auth.JWTMiddleware())
-
+	e.GET("/401", func(c echo.Context) error {
+		return echo.ErrUnauthorized
+	})
 	e.Logger.Fatal(e.Start(":1323"))
 }
