@@ -7,7 +7,7 @@ import (
 	"github.com/thongtiger/oauth-rfc6749/auth"
 	"github.com/thongtiger/oauth-rfc6749/redis"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"gopkg.in/mgo.v2/bson"
 )
 

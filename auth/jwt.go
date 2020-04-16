@@ -7,8 +7,8 @@ import (
 	"github.com/thongtiger/oauth-rfc6749/redis"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gopkg.in/mgo.v2/bson"
 )
 
