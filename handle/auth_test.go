@@ -8,7 +8,7 @@ import (
 
 	"github.com/thongtiger/oauth-rfc6749/handle"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 )
 
