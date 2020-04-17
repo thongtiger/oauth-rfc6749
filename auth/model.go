@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TokenClaim struct {
@@ -23,12 +23,12 @@ type Oauth2 struct {
 }
 
 type User struct {
-	ID             bson.ObjectId `json:"_id" bson:"_id,omitempty"`
-	Role           string        `json:"role" bson:"role,omitempty"`
-	Scope          []string      `json:"scope"`
-	Username       string        `json:"username" bson:"username,omitempty"`
-	Password       string        `json:"password" bson:"password,omitempty"`
-	Name           string        `json:"name" bson:"name,omitempty"`
-	CreateTime     time.Time     `json:"createTime" bson:"createTime"`
-	LatestLoggedin time.Time     `json:"latestLoggedin" bson:"latestLoggedin"`
+	ID             primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Role           string             `json:"role" bson:"role,omitempty"`
+	Scope          []string           `json:"scope"`
+	Username       string             `json:"username" bson:"username,omitempty"`
+	Password       string             `json:"password" bson:"password,omitempty"`
+	Name           string             `json:"name" bson:"name,omitempty"`
+	CreateTime     time.Time          `json:"createTime" bson:"createTime"`
+	LatestLoggedin time.Time          `json:"latestLoggedin" bson:"latestLoggedin"`
 }

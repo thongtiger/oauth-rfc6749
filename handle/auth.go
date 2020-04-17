@@ -4,11 +4,12 @@ import (
 	"net/http"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/thongtiger/oauth-rfc6749/auth"
 	"github.com/thongtiger/oauth-rfc6749/redis"
 
 	"github.com/labstack/echo"
-	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -40,7 +41,8 @@ func TokenHandle(c echo.Context) (err error) {
 			return c.JSON(http.StatusBadRequest, echo.Map{"message": "refresh_token does not exist or expired"})
 		}
 		// generate token
-		user := auth.User{ID: bson.ObjectIdHex(claim.ID), Role: claim.Role, Scope: claim.Scope}
+		objID, _ := primitive.ObjectIDFromHex(claim.ID)
+		user := auth.User{ID: objID, Role: claim.Role, Scope: claim.Scope}
 		return GenerateTK(c, user)
 	}
 	return c.JSON(http.StatusUnauthorized, echo.Map{})

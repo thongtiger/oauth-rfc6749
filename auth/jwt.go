@@ -9,7 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const secretJWT = "secret"
@@ -18,7 +18,7 @@ const secretJWT = "secret"
 func ValidateUser(username, password string) (bool, User) {
 	if username == "joe" && password == "password" {
 		return true, User{
-			ID:       bson.NewObjectId(),
+			ID:       primitive.NewObjectID(),
 			Name:     "ioe",
 			Username: "ioe",
 			Role:     "emp",
