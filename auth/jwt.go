@@ -86,3 +86,9 @@ func NewToken(id string, expiresIn time.Duration, tokenType string, role string,
 
 	return t, err
 }
+func TokenInfo(c echo.Context) *TokenClaim {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*TokenClaim)
+	// strconv.Itoa(claims.ID)
+	return claims
+}
