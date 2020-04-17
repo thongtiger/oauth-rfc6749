@@ -24,9 +24,10 @@ func main() {
 	})
 	e.POST("/oauth2/token", handle.TokenHandle)
 
-	e.GET("/protected", func(c echo.Context) error {
-		return c.String(http.StatusOK, "allow protected")
-	}, auth.JWTMiddleware())
+	e.GET("/protected", func(c echo.Context) error { return c.String(http.StatusOK, "allow protected") }, auth.JWTMiddleware())
+
+	e.GET("/logout", handle.LogoutHandle, auth.JWTMiddleware())
+
 	e.GET("/401", func(c echo.Context) error {
 		return echo.ErrUnauthorized
 	})
