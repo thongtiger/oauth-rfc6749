@@ -13,8 +13,8 @@ import (
 
 const (
 	//accessTokenDuration  = time.Duration(time.Second* 5) // test
-	accessTokenDuration  = time.Duration(time.Minute * 15)
-	refreshTokenDuration = time.Duration(time.Minute * 30)
+	accessTokenDuration  = time.Duration(time.Minute * 1) // 15
+	refreshTokenDuration = time.Duration(time.Minute * 5) // 30
 )
 
 // TokenHandle route
