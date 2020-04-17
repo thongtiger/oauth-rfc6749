@@ -1,10 +1,12 @@
 package auth
 
 import (
+	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type TokenClaim struct {
@@ -31,4 +33,27 @@ type User struct {
 	Name           string             `json:"name" bson:"name,omitempty"`
 	CreateTime     time.Time          `json:"createTime" bson:"createTime"`
 	LatestLoggedin time.Time          `json:"latestLoggedin" bson:"latestLoggedin"`
+}
+
+// BcryptCost : Cost
+const BcryptCost = 13
+
+// VerifyPassword : checking
+func (u *User) VerifyPassword(input string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(input))
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return true
+}
+
+// HashingPassword : when set to model
+func (u *User) HashingPassword() error {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(u.Password), BcryptCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(hashed)
+	return nil
 }
