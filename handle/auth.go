@@ -67,3 +67,15 @@ func GenerateTK(c echo.Context, user auth.User) (err error) {
 		"name":          user.Name,
 	})
 }
+
+// LogoutHandle : delete claimID in redis
+func LogoutHandle(c echo.Context) (err error) {
+	claim := auth.TokenInfo(c)
+	if claim == nil {
+		return c.JSON(http.StatusOK, echo.Map{"message": "logout fail"})
+	}
+	if err = redis.DelClientID(claim.ID); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"message": "radis can't delete key"})
+	}
+	return c.JSON(http.StatusOK, echo.Map{"message": "logout succeeded"})
+}
