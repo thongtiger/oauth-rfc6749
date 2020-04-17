@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -53,4 +54,16 @@ func SetRefreshToken(ClientID, RefreshToken string, ExpireIn time.Duration) (boo
 		return false, fmt.Errorf("redis: error set new refresh_token")
 	}
 	return true, nil
+}
+
+func DelClientID(ClientID string) error {
+	client := RedisClient()
+	defer client.Close()
+
+	err := client.Del(ClientID).Err()
+	if err != nil {
+		return errors.New("redis: error del clientID")
+	}
+	return nil
+
 }
