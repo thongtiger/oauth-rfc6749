@@ -18,8 +18,8 @@ type TokenClaim struct {
 }
 
 type Oauth2 struct {
-	Username     string `json:"username" form:"username" query:"username"`
-	Password     string `json:"password" form:"password" query:"password"`
+	Username     string `json:"username,omitempty" form:"username" query:"username"`
+	Password     string `json:"password,omitempty" form:"password" query:"password"`
 	GrantType    string `json:"grant_type" form:"grant_type" query:"grant_type"`
 	RefreshToken string `json:"refresh_token" form:"refresh_token" query:"refresh_token"`
 }
