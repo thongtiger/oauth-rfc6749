@@ -20,8 +20,8 @@ const (
 
 // TokenHandle route
 func TokenHandle(c echo.Context) (err error) {
-	body := new(auth.Oauth2)
-	if err = c.Bind(body); err != nil {
+	body := auth.Oauth2{}
+	if err = c.Bind(&body); err != nil {
 		return c.JSON(http.StatusUnsupportedMediaType, echo.Map{})
 	}
 	switch body.GrantType {
@@ -31,21 +31,26 @@ func TokenHandle(c echo.Context) (err error) {
 			return GenerateTK(c, user)
 		}
 	case "refresh_token":
-		// validate
-		tokenValid, claim := auth.ValidateRefreshToken(body.RefreshToken)
-		if !tokenValid {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": "bad refresh_token"})
-		}
-		// exists
-		if exist := redis.Exists(claim.ID, body.RefreshToken); !exist {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": "refresh_token does not exist or expired"})
-		}
-		// generate token
-		objID, _ := primitive.ObjectIDFromHex(claim.ID)
-		user := auth.User{ID: objID, Role: claim.Role, Scope: claim.Scope}
-		return GenerateTK(c, user)
+		return RefreshTK(c, body)
 	}
 	return c.JSON(http.StatusUnauthorized, echo.Map{})
+}
+
+// RefreshTK reset token
+func RefreshTK(c echo.Context, oauth2 auth.Oauth2) (err error) {
+	// validate
+	tokenValid, claim := auth.ValidateRefreshToken(oauth2.RefreshToken)
+	if !tokenValid {
+		return c.JSON(http.StatusBadRequest, echo.Map{"message": "bad refresh_token"})
+	}
+	// exists
+	if exist := redis.Exists(claim.ID, oauth2.RefreshToken); !exist {
+		return c.JSON(http.StatusBadRequest, echo.Map{"message": "refresh_token does not exist or expired"})
+	}
+	// generate token
+	objID, _ := primitive.ObjectIDFromHex(claim.ID)
+	user := auth.User{ID: objID, Role: claim.Role, Scope: claim.Scope}
+	return GenerateTK(c, user)
 }
 
 //GenerateTK generate response token
