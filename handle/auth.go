@@ -49,31 +49,30 @@ func RefreshTK(c echo.Context, oauth2 auth.Oauth2) (err error) {
 	}
 	// generate token
 	objID, _ := primitive.ObjectIDFromHex(claim.ID)
-	user := auth.User{ID: objID, Role: claim.Role, Scope: claim.Scope}
+	user := auth.User{ID: objID, Username: claim.Username, Role: claim.Role, Scope: claim.Scope}
 	return GenerateTK(c, user)
 }
 
 //GenerateTK generate response token
 func GenerateTK(c echo.Context, user auth.User) (err error) {
-	accessToken, err := auth.NewToken(user.ID.Hex(), accessTokenDuration, "access_token", user.Role, user.Scope...)
+	accessToken, err := auth.NewToken(user.ID.Hex(), user.Username, accessTokenDuration, "access_token", user.Role, user.Scope...)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "can't generate access_token", "err": err.Error()})
 	}
-	refreshToken, err := auth.NewToken(user.ID.Hex(), refreshTokenDuration, "refresh_token", user.Role, user.Scope...)
+	refreshToken, err := auth.NewToken(user.ID.Hex(), user.Username, refreshTokenDuration, "refresh_token", user.Role, user.Scope...)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "can't generate refresh_token"})
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"client_id":     user.ID,
-		"username": user.Username,
+		"client_id":        user.ID,
+		"username":         user.Username,
 		"latest_logged_in": user.LatestLoggedin,
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
-		"token_type":    "bearer",
-		"expires_in":    accessTokenDuration.Milliseconds(), // for javascript : setInterval
-		"scope":         user.Scope,
-		"role":          user.Role,
-		"name":          user.Name,
+		"access_token":     accessToken,
+		"refresh_token":    refreshToken,
+		"token_type":       "bearer",
+		"expires_in":       accessTokenDuration.Milliseconds(), // for javascript : setInterval
+		"scope":            user.Scope,
+		"role":             user.Role,
 	})
 }
 

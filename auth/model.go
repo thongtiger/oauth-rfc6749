@@ -10,10 +10,11 @@ import (
 )
 
 type TokenClaim struct {
-	ID    string   `json:"id"`
-	Type  string   `json:"type"`
-	Role  string   `json:"role"`
-	Scope []string `json:"scope"`
+	ID       string   `json:"id"`
+	Username string   `json:"username"`
+	Type     string   `json:"type"`
+	Role     string   `json:"role"`
+	Scope    []string `json:"scope"`
 	jwt.StandardClaims
 }
 
@@ -25,14 +26,14 @@ type Oauth2 struct {
 }
 
 type User struct {
-	ID             primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	Role           string             `json:"role" bson:"role,omitempty"`
-	Scope          []string           `json:"scope"`
-	Username       string             `json:"username" bson:"username,omitempty"`
-	Password       string             `json:"password" bson:"password,omitempty"`
-	Name           string             `json:"name" bson:"name,omitempty"`
-	CreateTime     time.Time          `json:"createTime" bson:"createTime"`
-	LatestLoggedin time.Time          `json:"latestLoggedin" bson:"latestLoggedin"`
+	ID       primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Role     string             `json:"role" bson:"role,omitempty"`
+	Scope    []string           `json:"scope"`
+	Username string             `json:"username" bson:"username,omitempty"`
+	Password string             `json:"password" bson:"password,omitempty"`
+	// Name           string             `json:"name" bson:"name,omitempty"`
+	CreateTime     time.Time `json:"createTime" bson:"createTime"`
+	LatestLoggedin time.Time `json:"latestLoggedin" bson:"latestLoggedin"`
 }
 
 // BcryptCost : Cost

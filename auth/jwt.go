@@ -18,8 +18,8 @@ const secretJWT = "secret"
 func ValidateUser(username, password string) (bool, User) {
 	if username == "joe" && password == "password" {
 		return true, User{
-			ID:       primitive.NewObjectID(),
-			Name:     "ioe",
+			ID: primitive.NewObjectID(),
+			// Name:     "ioe",
 			Username: "ioe",
 			Role:     "emp",
 			Scope:    []string{"1", "2"},
@@ -61,10 +61,11 @@ func JWTMiddleware() echo.MiddlewareFunc {
 	}) //echo.HandlerFunc
 }
 
-func NewToken(id string, expiresIn time.Duration, tokenType string, role string, scope ...string) (string, error) {
+func NewToken(id, username string, expiresIn time.Duration, tokenType string, role string, scope ...string) (string, error) {
 	now := time.Now()
 	claims := &TokenClaim{
 		id,
+		username,
 		tokenType,
 		role,
 		scope,
