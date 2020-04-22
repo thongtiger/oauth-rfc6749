@@ -64,15 +64,14 @@ func GenerateTK(c echo.Context, user auth.User) (err error) {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "can't generate refresh_token"})
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"client_id":        user.ID,
-		"username":         user.Username,
-		"latest_logged_in": user.LatestLoggedin,
-		"access_token":     accessToken,
-		"refresh_token":    refreshToken,
-		"token_type":       "bearer",
-		"expires_in":       accessTokenDuration.Milliseconds(), // for javascript : setInterval
-		"scope":            user.Scope,
-		"role":             user.Role,
+		"client_id":     user.ID,
+		"username":      user.Username,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+		"token_type":    "bearer",
+		"expires_in":    accessTokenDuration.Milliseconds(), // for javascript : setInterval
+		"scope":         user.Scope,
+		"role":          user.Role,
 	})
 }
 
