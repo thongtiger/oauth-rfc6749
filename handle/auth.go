@@ -65,10 +65,12 @@ func GenerateTK(c echo.Context, user auth.User) (err error) {
 	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"client_id":     user.ID,
+		"username": user.Username,
+		"latest_logged_in": user.LatestLoggedin,
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		"token_type":    "bearer",
-		"expires_in":    int64(accessTokenDuration.Seconds()),
+		"expires_in":    accessTokenDuration.Milliseconds(), // for javascript : setInterval
 		"scope":         user.Scope,
 		"role":          user.Role,
 		"name":          user.Name,
@@ -82,7 +84,7 @@ func LogoutHandle(c echo.Context) (err error) {
 		return c.JSON(http.StatusOK, echo.Map{"message": "logout fail"})
 	}
 	if err = redis.DelClientID(claim.ID); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"message": "radis can't delete key"})
+		return c.JSON(http.StatusBadRequest, echo.Map{"message": "redis can't delete key"})
 	}
 	return c.JSON(http.StatusOK, echo.Map{"message": "logout succeeded"})
 }
