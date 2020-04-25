@@ -2,6 +2,7 @@ package auth
 
 import (
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/thongtiger/oauth-rfc6749/redis"
@@ -59,6 +60,22 @@ func JWTMiddleware() echo.MiddlewareFunc {
 			return false
 		},
 	}) //echo.HandlerFunc
+}
+
+func AcceptedRole(roles ...string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			user := c.Get("user").(*jwt.Token)
+			claims := user.Claims.(*TokenClaim)
+
+			for _, checkrole := range roles {
+				if checkrole == claims.Role {
+					return next(c)
+				}
+			}
+			return c.JSON(http.StatusForbidden, echo.Map{"message": "Access Denied"})
+		}
+	}
 }
 
 func NewToken(id, username string, expiresIn time.Duration, tokenType string, role string, scope ...string) (string, error) {
