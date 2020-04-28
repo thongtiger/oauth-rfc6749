@@ -30,7 +30,7 @@ type User struct {
 	Role     string             `json:"role" bson:"role,omitempty"`
 	Scope    []string           `json:"scope"`
 	Username string             `json:"username" bson:"username,omitempty"`
-	Password string             `json:"password" bson:"password,omitempty"`
+	Password string             `json:"-" bson:"password,omitempty"`
 	// Name           string             `json:"name" bson:"name,omitempty"`
 	CreateTime     time.Time `json:"createTime" bson:"createTime"`
 	LatestLoggedin time.Time `json:"latestLoggedin" bson:"latestLoggedin"`
