@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -11,8 +13,16 @@ import (
 
 // RedisClient connector
 func RedisClient() *redis.Client {
+	var host, port = "localhost", "6379"
+	if val, ok := os.LookupEnv("REDIS_HOST"); ok {
+		host = strings.TrimSpace(val)
+	}
+	if val, ok := os.LookupEnv("REDIS_PORT"); ok {
+		port = strings.TrimSpace(val)
+	}
+
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     host + ":" + port,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
